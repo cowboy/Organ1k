@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the 'Organ1k' target in the 'Organ1k' project.
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <AppKit/AppKit.h>
+#endif
