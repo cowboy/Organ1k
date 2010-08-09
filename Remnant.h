@@ -15,12 +15,14 @@
 @interface Remnant : NSObject {
   NSPoint point;
   NSColor *color;
+  NSBezierPath *path;
   float size;
   float dir;
 }
 
 @property NSPoint point;
 @property(retain) NSColor *color;
+@property(retain) NSBezierPath *path;
 @property float size, dir;
 
 @end

@@ -14,6 +14,6 @@
 
 @implementation Remnant
 
-@synthesize point, color, size, dir;
+@synthesize point, color, path, size, dir;
 
 @end

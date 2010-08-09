@@ -44,6 +44,7 @@
   
   float remnant_min_size;
   float remnant_max_size;
+  float remnant_scale;
   
   NSRect viewBounds;
   NSSize viewSize;

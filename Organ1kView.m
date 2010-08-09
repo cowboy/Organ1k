@@ -75,7 +75,9 @@
     remnant_max_size = 8.0;
     remnant_min_size = 3.0;
     
-    max_radius -= remnant_max_size;
+    remnant_scale = max_radius / 600.0;
+    
+    max_radius -= 20 * remnant_scale;
     
     int i;
     
@@ -111,20 +113,54 @@
   //NSLog(@"drawRect");
   [super drawRect:rect];
   
-  /*
-  NSPoint item;
-  for ( int i = 0; i < num_items; i++ ) {
-    item = [[items objectAtIndex:i] pointValue];
-    [[NSColor grayColor] set];
-    
-    //NSLog(@"remnant %i (%f, %f)", i, remnant.x, remnant.y );
-    item_rect = NSMakeRect( item.x - ( size / 2.0 ), item.y - ( size / 2.0 ), size, size );
-    //NSRectFill( item_rect );
-    
-    [[NSBezierPath bezierPathWithOvalInRect:item_rect] fill];
-  }
-  */
+  CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
   
+  int i;
+  Remnant *remnant;
+  CGFloat r, g, b, a;
+  
+  for ( i = 0; i < max_remnants; i++ ) {
+    remnant = [remnants objectAtIndex:i];
+    
+    if ( remnant.dir == -10000.0 ) {
+      break;
+    }
+    
+    //NSLog(@"remnant %i (%f, %f)", i, remnant.point.x, remnant.point.y );
+    
+    // Pulse the circle.
+    remnant.size += remnant.dir;
+    remnant.dir = remnant.size >= remnant_max_size ? -1.0
+    : remnant.size <= remnant_min_size ? 1.0
+    : remnant.dir;
+    
+    // Draw the circle.
+    [remnant.color getRed:&r green:&g blue:&b alpha:&a];
+    
+    CGContextSetRGBFillColor( context, r, g, b, a );
+    CGContextBeginPath( context );
+    CGContextAddArc( context, remnant.point.x, remnant.point.y, remnant.size * remnant_scale, 0.0, 2 * pi, 0 );
+    CGContextClosePath( context );
+    CGContextDrawPath( context, kCGPathFill );
+  }
+  
+  //CGContextFlush( context );
+  
+  /*
+   NSPoint item;
+   for ( int i = 0; i < num_items; i++ ) {
+   item = [[items objectAtIndex:i] pointValue];
+   [[NSColor grayColor] set];
+   
+   //NSLog(@"remnant %i (%f, %f)", i, remnant.x, remnant.y );
+   item_rect = NSMakeRect( item.x - ( size / 2.0 ), item.y - ( size / 2.0 ), size, size );
+   //NSRectFill( item_rect );
+   
+   [[NSBezierPath bezierPathWithOvalInRect:item_rect] fill];
+   }
+   */
+  
+  /*
   // Draw "circle" remnants.
   int i;
   Remnant *remnant;
@@ -155,7 +191,7 @@
     //NSRectFill( item_rect );
     [[NSBezierPath bezierPathWithOvalInRect:item_rect] fill];
   }
-  
+  */
 }
 
 - (void)animateOneFrame
