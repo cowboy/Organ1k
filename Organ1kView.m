@@ -20,6 +20,7 @@
   if (self) {
     frame_rate = 30.0;
     frame_count = 0;
+    fps = 1000 / frame_rate;
     
     cycle_speed_adjust = 1.5;
     
@@ -28,6 +29,8 @@
     pi = acosf( -1.0 );
     pi_over_180 = pi / 180.0;
     
+    // Some JS to generate the color values:
+    // 
     // var colors = 'f001fa01ff0107010ff100f14081e8e'.split(1);
     // $.each( colors, function( i, hex ){
     //   var rgb = $.map( hex.split(''), function(c,i){
@@ -51,18 +54,18 @@
     
     blip_cur = -1;
     
-    current = SSRandomFloatBetween( 0, 360.0 );
+    theta = rnd() * 360.0;
     
     cycle_speed = 1.0;
     delay_speed = 1.0;
     math_mode = 0.0;
     
-    dir = (float)( SSRandomIntBetween( 0, 1 ) * 2 - 1 );
+    dir = rnd() < 0.5 ? -1.0 : 1.0;
     
-    NSSize viewSize = [self bounds].size;
+    NSSize view_size = [self bounds].size;
     
-    origin.x = viewSize.width  / 2.0;
-    origin.y = viewSize.height / 2.0;
+    origin.x = view_size.width  / 2.0;
+    origin.y = view_size.height / 2.0;
     
     max_radius = fmin( origin.x, origin.y );
     
@@ -103,6 +106,7 @@
   [super drawRect:rect];
   
   CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
+  CGContextSetFlatness( context, 2.0 );
   
   for ( int i = 0; i < num_blips; i++ ) {
     
@@ -110,13 +114,13 @@
       break;
     }
     
-    // Pulse the circle.
+    // Pulse the blip.
     blips[i].s += blips[i].d;
     blips[i].d = blips[i].s >= blip_max_size ? -1.0
                : blips[i].s <= blip_min_size ? 1.0
                : blips[i].d;
     
-    // Draw the circle.
+    // Draw the blip.
     CGContextSetRGBFillColor( context, blips[i].c.r, blips[i].c.g, blips[i].c.b, 1.0 );
     CGContextBeginPath( context );
     CGContextAddArc( context, origin.x + blips[i].x, origin.y + blips[i].y, blips[i].s * blip_scale, 0.0, 2 * pi, 0 );
@@ -131,13 +135,14 @@
 {
   //[self setNeedsDisplay:YES];return;
   
-  frame_count = ( frame_count + 1 ) % (int)( 1000 / frame_rate );
-  //NSLog(@"%i", frame_count);
+  frame_count = ( frame_count + 1 ) % fps;
+  
+  //NSLog(@"%i %i", frame_count, fps);
   if ( frame_count == 0 ) {
     float n;
-    float r1 = SSRandomFloatBetween( 0.0, 1.0 );
+    float r1 = rnd();
     
-    while ( last_n == (int)( n = SSRandomFloatBetween( 0.0, 6.0 ) ) ) {};
+    while ( last_n == (int)( n = rnd() * 6.0 ) ) {};
     
     last_n = (int)n;
     
@@ -171,40 +176,45 @@
       
     } else {
       blip_max_size = r1 * 10.0 + 6.0;
-      blip_min_size = fmin( blip_max_size - 4, SSRandomFloatBetween( 0.0, 1.0 ) * 5 + 2 );
+      blip_min_size = fmin( blip_max_size - 4.0, rnd() * 5.0 + 2.0 );
       //NSLog(@"blip_max_size %f, blip_min_size %f", blip_max_size, blip_min_size);
     }
   }
   
   //NSLog(@"animateOneFrame");
-  //NSLog(@"current %f", current);
+  //NSLog(@"theta %f", theta);
   
-  float x, y, r, a, deg;
+  // Do some math!
+  float x, y, r, a, n;
+  
+  theta = fmod( theta, 360.0 );
   
   if ( math_mode < 1.0 ) {
-    current -= cycle_speed * dir * 4 * cycle_speed_adjust;
+    // Circle.
+    theta -= cycle_speed * dir * 4 * cycle_speed_adjust;
     
-    deg = current * pi_over_180;
+    n = theta * pi_over_180;
     
-    x = sinf( deg ) * max_radius;
-    y = cosf( deg ) * max_radius;
+    x = sinf( n ) * max_radius;
+    y = cosf( n ) * max_radius;
     
   } else {
-    current -= cycle_speed * dir * 2 * cycle_speed_adjust;
+    // Spiro.
+    theta -= cycle_speed * dir * 2 * cycle_speed_adjust;
     
-    deg = current * pi_over_180;
+    n = theta * pi_over_180;
     
-    x = sinf( deg ) * max_radius;
+    x = sinf( n ) * max_radius;
     y = 0.0;
     
     r = sqrtf( powf( x, 2.0 ) + powf( y, 2.0 ) );
-    a = atan2f( y, x ) + ( deg / math_mode );
+    a = atan2f( y, x ) + ( n / math_mode );
     
     x = r * cosf( a );
     y = r * sinf( a );
   }
   
-  // Update "items" array.
+  // Update items.
   for ( int i = 0; i < num_items; i++ ) {
     if ( i == 0 ) {
       items[i].x = x;
@@ -215,6 +225,7 @@
     }
   }
   
+  // Add (or replace) new blips.
   for ( int i = 0, j; i < num_colors; i++ ) {
     j = (float)( i * ( num_items - 1 ) ) / (float)( num_colors - 1 );
     

@@ -296,7 +296,7 @@
 				EF7AD72F08BB986600CE4634 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		EF7AD73108BB986600CE4634 /* Build configuration list for PBXProject "Organ1k" */ = {
 			isa = XCConfigurationList;
@@ -305,7 +305,7 @@
 				EF7AD73308BB986600CE4634 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

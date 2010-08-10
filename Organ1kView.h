@@ -20,6 +20,7 @@
   
   float frame_rate;
   int frame_count;
+  int fps;
   
   float cycle_speed_adjust;
   
@@ -44,7 +45,7 @@
   
   int blip_cur;
   
-  float current;
+  float theta;
   float cycle_speed;
   float delay_speed;
   float math_mode;
@@ -60,3 +61,7 @@
 }
 
 @end
+
+static __inline__ float rnd() {
+  return (float) random() / (float) RAND_MAX;
+}
