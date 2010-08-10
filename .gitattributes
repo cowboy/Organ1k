@@ -1,2 +1,2 @@
 *.pbxproj -crlf -diff -merge
-*.zip -crlf -diff
+*.dmg -crlf -diff

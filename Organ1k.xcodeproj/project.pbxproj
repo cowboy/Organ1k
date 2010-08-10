@@ -153,6 +153,7 @@
 				8D255ACD0486D3F9007BF209 /* Frameworks */,
 				8D255AD00486D3F9007BF209 /* Rez */,
 				CBBC28D2120B854500CBCB54 /* CopyFiles */,
+				CBA59C901211AD4A00475158 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -204,6 +205,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXRezBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CBA59C901211AD4A00475158 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\nif [ \"$BUILD_STYLE\" == \"Release\" ]; then\n  CUR=$(pwd)\n  cd \"$TARGET_BUILD_DIR\"\n  hdiutil create Organ1k.dmg -srcfolder Organ1k.saver -ov -volname \"Organ1k\"\n  #zip Organ1k.zip Organ1k.saver\n  mv Organ1k.dmg \"$CUR\"\n  cd \"$CUR\"\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D255ACB0486D3F9007BF209 /* Sources */ = {

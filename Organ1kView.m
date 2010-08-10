@@ -108,6 +108,18 @@
   CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
   CGContextSetFlatness( context, 2.0 );
   
+  // Draw items.
+  /*
+  for ( int i = 0; i < num_items; i++ ) {
+    CGContextSetRGBFillColor( context, 1.0, 1.0, 1.0, 0.9 );
+    CGContextBeginPath( context );
+    CGContextAddArc( context, origin.x + items[i].x, origin.y + items[i].y, 3.0, 0.0, 2 * pi, 0 );
+    CGContextClosePath( context );
+    CGContextDrawPath( context, kCGPathFill );
+  }
+  */
+  
+  // Draw blips.
   for ( int i = 0; i < num_blips; i++ ) {
     
     if ( blips[i].d == -10000.0 ) {
@@ -186,8 +198,6 @@
   
   // Do some math!
   float x, y, r, a, n;
-  
-  theta = fmod( theta, 360.0 );
   
   if ( math_mode < 1.0 ) {
     // Circle.
