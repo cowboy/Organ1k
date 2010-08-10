@@ -14,8 +14,6 @@
 		8D255ACE0486D3F9007BF209 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		8D255ACF0486D3F9007BF209 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06F27B2DFFEEEFEF11CA0E56 /* ScreenSaver.framework */; };
 		CBBC28D7120B859500CBCB54 /* Organ1k.saver in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D255AD30486D3F9007BF209 /* Organ1k.saver */; };
-		CBBED2DC1210445D00A82220 /* Remnant.h in Headers */ = {isa = PBXBuildFile; fileRef = CBBED2DA1210445D00A82220 /* Remnant.h */; };
-		CBBED2DD1210445D00A82220 /* Remnant.m in Sources */ = {isa = PBXBuildFile; fileRef = CBBED2DB1210445D00A82220 /* Remnant.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -40,8 +38,6 @@
 		32DBCFA80370C50100C91783 /* Organ1k_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Organ1k_Prefix.pch; sourceTree = "<group>"; };
 		8D255AD20486D3F9007BF209 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D255AD30486D3F9007BF209 /* Organ1k.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Organ1k.saver; sourceTree = BUILT_PRODUCTS_DIR; };
-		CBBED2DA1210445D00A82220 /* Remnant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Remnant.h; sourceTree = "<group>"; };
-		CBBED2DB1210445D00A82220 /* Remnant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Remnant.m; sourceTree = "<group>"; };
 		F50079790118B23001CA0E54 /* Organ1kView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Organ1kView.h; sourceTree = "<group>"; };
 		F500797A0118B23001CA0E54 /* Organ1kView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Organ1kView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,8 +90,6 @@
 			children = (
 				F50079790118B23001CA0E54 /* Organ1kView.h */,
 				F500797A0118B23001CA0E54 /* Organ1kView.m */,
-				CBBED2DA1210445D00A82220 /* Remnant.h */,
-				CBBED2DB1210445D00A82220 /* Remnant.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -143,7 +137,6 @@
 			files = (
 				8D255AC70486D3F9007BF209 /* Organ1k_Prefix.pch in Headers */,
 				8D255AC80486D3F9007BF209 /* Organ1kView.h in Headers */,
-				CBBED2DC1210445D00A82220 /* Remnant.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,7 +211,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D255ACC0486D3F9007BF209 /* Organ1kView.m in Sources */,
-				CBBED2DD1210445D00A82220 /* Remnant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

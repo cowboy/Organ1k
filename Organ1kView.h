@@ -11,7 +11,6 @@
 
 #include <math.h>
 #import <ScreenSaver/ScreenSaver.h>
-#import <Remnant.h>
 
 
 @interface Organ1kView : ScreenSaverView {
@@ -19,20 +18,31 @@
   float pi;
   float pi_over_180;
   
-  float framerate;
+  float frame_rate;
   int frame_count;
   
   float cycle_speed_adjust;
   
+  NSPoint origin;
+  
+  struct color {
+    float r, g, b;
+  } colors[8];
+  
+  struct item {
+    float x, y;
+  } items[32];
+  
+  struct blip {
+    float x, y, s, d;
+    struct color c;
+  } blips[300];
+  
+  int num_colors;
   int num_items;
-  int max_remnants;
-  int remnant_current;
+  int num_blips;
   
-  NSMutableArray *items;
-  NSMutableArray *remnants;
-  NSMutableArray *remnant_colors;
-  
-  int num_remnant_colors;
+  int blip_cur;
   
   float current;
   float cycle_speed;
@@ -42,19 +52,11 @@
   
   int last_n;
   
-  float remnant_min_size;
-  float remnant_max_size;
-  float remnant_scale;
-  
-  NSRect viewBounds;
-  NSSize viewSize;
-  NSPoint viewCenter;
+  float blip_min_size;
+  float blip_max_size;
+  float blip_scale;
   
   float max_radius;
 }
 
 @end
-
-static __inline__ CGFloat minf( CGFloat a, CGFloat b ) {
-  return a < b ? a : b;
-}

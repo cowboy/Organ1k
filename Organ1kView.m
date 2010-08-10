@@ -18,7 +18,7 @@
 {
   self = [super initWithFrame:frame isPreview:isPreview];
   if (self) {
-    framerate = 30.0;
+    frame_rate = 30.0;
     frame_count = 0;
     
     cycle_speed_adjust = 1.5;
@@ -28,71 +28,61 @@
     pi = acosf( -1.0 );
     pi_over_180 = pi / 180.0;
     
-    items = [NSMutableArray array];
-    remnants = [NSMutableArray array];
-    
     // var colors = 'f001fa01ff0107010ff100f14081e8e'.split(1);
     // $.each( colors, function( i, hex ){
     //   var rgb = $.map( hex.split(''), function(c,i){
     //     return ( parseInt( c+c, 16 ) / 255 + '.0' ).replace( /\.(.{1,3}).*/, '.$1' );
     //   });
-    //   console.log('[remnant_colors addObject:[NSColor colorWithCalibratedRed:' + rgb[0] + ' green:' + rgb[1] + ' blue:' + rgb[2] + ' alpha:1.0]];');
+    //   console.log('colors['+i+'].r = '+rgb[0]+';colors['+i+'].g = '+rgb[1]+';colors['+i+'].b = '+rgb[2]+';');
     // });
     
-    remnant_colors = [NSMutableArray array];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:1.0 green:0.0 blue:0.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:1.0 green:0.666 blue:0.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:0.0 green:0.466 blue:0.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:0.266 green:0.0 blue:0.533 alpha:1.0]];
-    [remnant_colors addObject:[NSColor colorWithCalibratedRed:0.933 green:0.533 blue:0.933 alpha:1.0]];
+    colors[0].r = 1.0;   colors[0].g = 0.0;   colors[0].b = 0.0;
+    colors[1].r = 1.0;   colors[1].g = 0.666; colors[1].b = 0.0;
+    colors[2].r = 1.0;   colors[2].g = 1.0;   colors[2].b = 0.0;
+    colors[3].r = 0.0;   colors[3].g = 0.466; colors[3].b = 0.0;
+    colors[4].r = 0.0;   colors[4].g = 1.0;   colors[4].b = 1.0;
+    colors[5].r = 0.0;   colors[5].g = 0.0;   colors[5].b = 1.0;
+    colors[6].r = 0.266; colors[6].g = 0.0;   colors[6].b = 0.533;
+    colors[7].r = 0.933; colors[7].g = 0.533; colors[7].b = 0.933;
     
-    num_remnant_colors = [remnant_colors count];
+    num_colors = 8;
+    num_items  = 32;
+    num_blips  = 300;
     
-    num_items = 32;
-    max_remnants = 300;
+    blip_cur = -1;
     
-    remnant_current = -1;
-    
-    current = 0.0;
+    current = SSRandomFloatBetween( 0, 360.0 );
     
     cycle_speed = 1.0;
     delay_speed = 1.0;
     math_mode = 0.0;
     
-    dir = 1.0;
+    dir = (float)( SSRandomIntBetween( 0, 1 ) * 2 - 1 );
     
-    viewBounds = [self bounds];
-    viewSize   = [self bounds].size;
+    NSSize viewSize = [self bounds].size;
     
-    viewCenter.x = viewSize.width  / 2.0;
-    viewCenter.y = viewSize.height / 2.0;
+    origin.x = viewSize.width  / 2.0;
+    origin.y = viewSize.height / 2.0;
     
-    max_radius = fmin( viewSize.width, viewSize.height ) / 2;
+    max_radius = fmin( origin.x, origin.y );
     
-    remnant_max_size = 8.0;
-    remnant_min_size = 3.0;
+    blip_max_size = 8.0;
+    blip_min_size = 3.0;
     
-    remnant_scale = max_radius / 600.0;
+    blip_scale = max_radius / 600.0;
     
-    max_radius -= 20 * remnant_scale;
+    max_radius -= 20 * blip_scale;
     
-    int i;
-    
-    for ( i = 0; i < max_remnants; i++ ) {
-      Remnant *remnant = [[Remnant alloc] init];
-      remnant.dir = -10000.0;
-      [remnants addObject:remnant];
-      [remnant release];
+    for ( int i = 0; i < num_blips; i++ ) {
+      blips[i].d = -10000.0;
     }
     
-    for ( i = 0; i <= num_items; i++ ) {
-      [items addObject:[NSValue valueWithPoint:viewCenter]];
+    for ( int i = 0; i < num_items; i++ ) {
+      items[i].x = 0.0;
+      items[i].y = 0.0;
     }
     
-    [self setAnimationTimeInterval:1/framerate];
+    [self setAnimationTimeInterval: 1 / frame_rate ];
   }
   
   return self;
@@ -110,95 +100,38 @@
 
 - (void)drawRect:(NSRect)rect
 {
-  //NSLog(@"drawRect");
   [super drawRect:rect];
   
   CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
   
-  int i;
-  Remnant *remnant;
-  CGFloat r, g, b, a;
-  
-  for ( i = 0; i < max_remnants; i++ ) {
-    remnant = [remnants objectAtIndex:i];
+  for ( int i = 0; i < num_blips; i++ ) {
     
-    if ( remnant.dir == -10000.0 ) {
+    if ( blips[i].d == -10000.0 ) {
       break;
     }
     
-    //NSLog(@"remnant %i (%f, %f)", i, remnant.point.x, remnant.point.y );
-    
     // Pulse the circle.
-    remnant.size += remnant.dir;
-    remnant.dir = remnant.size >= remnant_max_size ? -1.0
-    : remnant.size <= remnant_min_size ? 1.0
-    : remnant.dir;
+    blips[i].s += blips[i].d;
+    blips[i].d = blips[i].s >= blip_max_size ? -1.0
+               : blips[i].s <= blip_min_size ? 1.0
+               : blips[i].d;
     
     // Draw the circle.
-    [remnant.color getRed:&r green:&g blue:&b alpha:&a];
-    
-    CGContextSetRGBFillColor( context, r, g, b, a );
+    CGContextSetRGBFillColor( context, blips[i].c.r, blips[i].c.g, blips[i].c.b, 1.0 );
     CGContextBeginPath( context );
-    CGContextAddArc( context, remnant.point.x, remnant.point.y, remnant.size * remnant_scale, 0.0, 2 * pi, 0 );
+    CGContextAddArc( context, origin.x + blips[i].x, origin.y + blips[i].y, blips[i].s * blip_scale, 0.0, 2 * pi, 0 );
     CGContextClosePath( context );
     CGContextDrawPath( context, kCGPathFill );
   }
   
   //CGContextFlush( context );
-  
-  /*
-   NSPoint item;
-   for ( int i = 0; i < num_items; i++ ) {
-   item = [[items objectAtIndex:i] pointValue];
-   [[NSColor grayColor] set];
-   
-   //NSLog(@"remnant %i (%f, %f)", i, remnant.x, remnant.y );
-   item_rect = NSMakeRect( item.x - ( size / 2.0 ), item.y - ( size / 2.0 ), size, size );
-   //NSRectFill( item_rect );
-   
-   [[NSBezierPath bezierPathWithOvalInRect:item_rect] fill];
-   }
-   */
-  
-  /*
-  // Draw "circle" remnants.
-  int i;
-  Remnant *remnant;
-  float size;
-  NSRect item_rect;
-  
-  for ( i = 0; i < max_remnants; i++ ) {
-    remnant = [remnants objectAtIndex:i];
-    
-    if ( remnant.dir == -10000.0 ) {
-      break;
-    }
-    
-    //NSLog(@"remnant %i (%f, %f)", i, remnant.point.x, remnant.point.y );
-    
-    // Pulse the circle.
-    remnant.size += remnant.dir;
-    remnant.dir = remnant.size >= remnant_max_size ? -1.0
-                : remnant.size <= remnant_min_size ? 1.0
-                : remnant.dir;
-    
-    // Draw the circle.
-    [remnant.color set];
-    
-    size = remnant.size * max_radius / 300.0;
-    item_rect = NSMakeRect( remnant.point.x - ( size / 2.0 ), remnant.point.y - ( size / 2.0 ), size, size );
-    
-    //NSRectFill( item_rect );
-    [[NSBezierPath bezierPathWithOvalInRect:item_rect] fill];
-  }
-  */
 }
 
 - (void)animateOneFrame
 {
   //[self setNeedsDisplay:YES];return;
   
-  frame_count = ( frame_count + 1 ) % (int)( 1000 / framerate );
+  frame_count = ( frame_count + 1 ) % (int)( 1000 / frame_rate );
   //NSLog(@"%i", frame_count);
   if ( frame_count == 0 ) {
     float n;
@@ -217,9 +150,11 @@
       //NSLog(@"dir %f", dir);
       
     } else if ( n < 2.0 ) {
-      for ( int i = 1; i < num_remnant_colors; i++ ) {
-        [remnant_colors exchangeObjectAtIndex:i-1 withObjectAtIndex:i];
+      struct color color = colors[0];
+      for ( int i = 1; i < num_colors; i++ ) {
+        colors[i-1] = colors[i];
       }
+      colors[num_colors-1] = color;
       //NSLog(@"color shift");
       
     } else if ( n < 3.0 ) {
@@ -235,76 +170,61 @@
       //NSLog(@"delay_speed %f", delay_speed);
       
     } else {
-      remnant_max_size = r1 * 10.0 + 6.0;
-      remnant_min_size = minf( remnant_max_size - 4, SSRandomFloatBetween( 0.0, 1.0 ) * 5 + 2 );
-      //NSLog(@"remnant_max_size %f, remnant_min_size %f", remnant_max_size, remnant_min_size);
+      blip_max_size = r1 * 10.0 + 6.0;
+      blip_min_size = fmin( blip_max_size - 4, SSRandomFloatBetween( 0.0, 1.0 ) * 5 + 2 );
+      //NSLog(@"blip_max_size %f, blip_min_size %f", blip_max_size, blip_min_size);
     }
   }
   
   //NSLog(@"animateOneFrame");
   //NSLog(@"current %f", current);
   
-  int i;
-  float x;
-  float y;
-  float r;
-  float a;
+  float x, y, r, a, deg;
   
   if ( math_mode < 1.0 ) {
     current -= cycle_speed * dir * 4 * cycle_speed_adjust;
     
-    x = sinf( current * pi_over_180 ) * max_radius;
-    y = cosf( current * pi_over_180 ) * max_radius;
+    deg = current * pi_over_180;
+    
+    x = sinf( deg ) * max_radius;
+    y = cosf( deg ) * max_radius;
     
   } else {
     current -= cycle_speed * dir * 2 * cycle_speed_adjust;
     
-    x = sinf( current * pi_over_180 ) * max_radius;
+    deg = current * pi_over_180;
+    
+    x = sinf( deg ) * max_radius;
     y = 0.0;
     
     r = sqrtf( powf( x, 2.0 ) + powf( y, 2.0 ) );
-    a = atan2f( y, x ) + ( current * pi_over_180 / math_mode );
+    a = atan2f( y, x ) + ( deg / math_mode );
     
     x = r * cosf( a );
     y = r * sinf( a );
   }
   
   // Update "items" array.
-  NSPoint item;
-  NSPoint this_item;
-  NSPoint prev_item;
-  
-  for ( i = 0; i <= num_items; i++ ) {
-    
+  for ( int i = 0; i < num_items; i++ ) {
     if ( i == 0 ) {
-      item = NSMakePoint( viewCenter.x + x, viewCenter.y + y );
-      
+      items[i].x = x;
+      items[i].y = y;
     } else {
-      this_item = [[items objectAtIndex:i] pointValue];
-      prev_item = [[items objectAtIndex:i-1] pointValue];
-      
-      item = NSMakePoint(
-                         this_item.x + ( prev_item.x - this_item.x ) / ( delay_speed + 1.0 ),
-                         this_item.y + ( prev_item.y - this_item.y ) / ( delay_speed + 1.0 ) );
+      items[i].x += ( items[i-1].x - items[i].x ) / ( delay_speed + 1.0 );
+      items[i].y += ( items[i-1].y - items[i].y ) / ( delay_speed + 1.0 );
     }
-    
-    [items replaceObjectAtIndex:i withObject:[NSValue valueWithPoint:item]];
   }
   
-  //NSLog(@"%f deg, delta (%f, %f), item0 (%f, %f)", deg, x, y, item0.x, item0.y );
-  
-  
-  Remnant *remnant;
-  for ( i = 0; i < num_remnant_colors; i++ ) {
-    item = [[items objectAtIndex:i*4] pointValue];
+  for ( int i = 0, j; i < num_colors; i++ ) {
+    j = (float)( i * ( num_items - 1 ) ) / (float)( num_colors - 1 );
     
-    remnant_current = ( remnant_current + 1 ) % max_remnants;
+    blip_cur = ( blip_cur + 1 ) % num_blips;
     
-    remnant = [remnants objectAtIndex:remnant_current];
-    remnant.point = NSMakePoint( item.x, item.y );
-    remnant.color = [remnant_colors objectAtIndex:i];
-    remnant.size = 1.0;
-    remnant.dir = 1.0;
+    blips[blip_cur].x = items[j].x;
+    blips[blip_cur].y = items[j].y;
+    blips[blip_cur].c = colors[i];
+    blips[blip_cur].s = 1.0;
+    blips[blip_cur].d = 1.0;
   }
   
   [self setNeedsDisplay:YES];
